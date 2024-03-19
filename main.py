@@ -16,14 +16,18 @@ FONT = pygame.font.SysFont('Verdana', 20)
 main_display = pygame.display.set_mode((WIDTH, HEIGHT))
 
 # Завантаження зображення гравця
-IMAGE_PATH = "animation_player"
-PLAYER_IMAGES = os.listdir(IMAGE_PATH)
+PLAYER_IMAGE_LEFT = "D:\\Dev\Projects\\Visual Game\\animation_player\\player_left"
+PLAYER_IMAGE_RIGHT = "D:\\Dev\Projects\\Visual Game\\animation_player\\player_right"
+PLAYER_IMAGES_LEFT = os.listdir(PLAYER_IMAGE_LEFT)
+PLAYER_IMAGES_RIGHT = os.listdir(PLAYER_IMAGE_RIGHT)
 CHANGE_IMAGE = pygame.USEREVENT + 1
 pygame.time.set_timer(CHANGE_IMAGE, 200)
 
 # Завантаження зображення ворога
-ENEMY_IMAGE_PATH = "animation_enemy"
-ENEMY_IMAGES = os.listdir(ENEMY_IMAGE_PATH)
+ENEMY_IMAGE_LEFT = "D:\\Dev\Projects\\Visual Game\\animation_enemy\\enemy_left"
+ENEMY_IMAGE_RIGHT = "D:\\Dev\Projects\\Visual Game\\animation_enemy\\enemy_right"
+ENEMY_IMAGES_LEFT = os.listdir(ENEMY_IMAGE_LEFT)
+ENEMY_IMAGES_RIGHT = os.listdir(ENEMY_IMAGE_RIGHT)
 ENEMY_CHANGE_IMAGE = pygame.USEREVENT + 2
 pygame.time.set_timer(ENEMY_CHANGE_IMAGE, 200)
 
@@ -41,6 +45,7 @@ player_attack = random.randint(5, 20)
 enemy_size = (91, 161)
 enemy_image = pygame.transform.scale(pygame.image.load('D:\\Dev\\Projects\\Visual Game\\enemy.png').convert_alpha(), player_size)
 enemy_rect = enemy_image.get_rect()
+enemy_speed = 2
 enemy_health = 100
 enemy_attack = random.randint(5, 20)
 
@@ -51,6 +56,9 @@ background_image = pygame.transform.scale(pygame.image.load('D:\\Dev\\Projects\\
 # Початкове положення ворога
 enemy_rect.centerx = WIDTH // 1.2  # По горизонталі в правому куті
 enemy_rect.bottom = HEIGHT // 1.25
+
+player_x = player_rect.centerx
+enemy_x = enemy_rect.centerx
 
 animate_enemy = True
 enemy_image_index = 0
@@ -89,17 +97,17 @@ def draw_health_bar_enemy(surface, health):
     bar_length = 200
     bar_height = 20
     health_bar = pygame.Rect(WIDTH - bar_length - 10, 10, bar_length, bar_height)  # Змінюємо координати для правого верхнього кута
-    
+
     # Здоров'я ворога відображається червоною полоскою
     pygame.draw.rect(surface, (255, 0, 0), health_bar)
-    
+
     # Обмеження, щоб полоска здоров'я не могла бути меншою за 0
     current_health = max(health, 0)
-    
+
     # Визначення ширини полоски здоров'я відповідно до поточного здоров'я
     bar_width = int(bar_length * current_health / 100)
     health_bar.width = bar_width
-    
+
     # Малювання полоски здоров'я залежно від поточного здоров'я
     pygame.draw.rect(surface, (0, 255, 0), health_bar)
 
@@ -123,19 +131,46 @@ while playing:
 
         if event.type == CHANGE_IMAGE:
             if animate_player:  # Перевіряємо, чи потрібно змінювати зображення гравця
-                player_image = pygame.image.load(os.path.join(IMAGE_PATH, PLAYER_IMAGES[image_index]))
+                player_image = pygame.image.load(os.path.join(PLAYER_IMAGE_RIGHT, PLAYER_IMAGES_RIGHT[image_index]))
                 player_image = pygame.transform.scale(player_image, player_size)  # Змінюємо розмір зображення
                 image_index += 1
-                if image_index >= len(PLAYER_IMAGES):
+                if image_index >= len(PLAYER_IMAGES_RIGHT):
                     image_index = 0
 
         if event.type == ENEMY_CHANGE_IMAGE:
             if animate_enemy:  # Перевіряємо, чи потрібно змінювати зображення ворога
-                enemy_image = pygame.image.load(os.path.join(ENEMY_IMAGE_PATH, ENEMY_IMAGES[enemy_image_index]))
+                enemy_image = pygame.image.load(os.path.join(ENEMY_IMAGE_LEFT, ENEMY_IMAGES_LEFT[enemy_image_index]))
                 enemy_image = pygame.transform.scale(enemy_image, enemy_size)  # Змінюємо розмір зображення
                 enemy_image_index += 1
-                if enemy_image_index >= len(ENEMY_IMAGES):
+                if enemy_image_index >= len(ENEMY_IMAGES_LEFT):
                     enemy_image_index = 0
+
+        if player_x < enemy_x:
+            enemy_direction = "left"  # Гравець знаходиться лівіше ворога
+        else:
+            enemy_direction = "right"  # Гравець знаходиться правіше ворога
+
+        # Визначення зображення ворога відповідно до його розташування та анімації
+        # if enemy_direction == "left":
+        #     enemy_image = pygame.image.load(os.path.join(ENEMY_IMAGE_PATH, "enemy_left.png"))
+        # else:
+        #     enemy_image = pygame.image.load(os.path.join(ENEMY_IMAGE_PATH, "enemy_right.png"))
+
+        # # Перевірка та зміна анімації ворога в залежності від напрямку руху
+        # if enemy_direction == "left":
+        #     if animate_enemy:  
+        #         enemy_image = pygame.image.load(os.path.join(ENEMY_IMAGE_PATH, ENEMY_IMAGES_left[enemy_image_index]))
+        #         enemy_image = pygame.transform.scale(enemy_image, enemy_size)  
+        #         enemy_image_index += 1
+        #         if enemy_image_index >= len(ENEMY_IMAGES_left):
+        #             enemy_image_index = 0
+        # else:
+        #     if animate_enemy:  
+        #         enemy_image = pygame.image.load(os.path.join(ENEMY_IMAGE_PATH, ENEMY_IMAGES_right[enemy_image_index]))
+        #         enemy_image = pygame.transform.scale(enemy_image, enemy_size)  
+        #         enemy_image_index += 1
+        #         if enemy_image_index >= len(ENEMY_IMAGES_right):
+        #             enemy_image_index = 0
 
     keys = pygame.key.get_pressed()
 
@@ -148,11 +183,20 @@ while playing:
         player_rect = player_rect.move(3, 0)  # Рух вправо
         animate_player = True  # Встановлюємо прапорець анімації
 
-    if animate_enemy:
-        if enemy_rect.left > WIDTH:
-            enemy_rect.right = 0
-        else:
-            enemy_rect = enemy_rect.move(-2, 0)  # Рух ворога вліво
+        
+
+    if enemy_rect.left <= 0 or enemy_rect.right >= WIDTH:
+        enemy_speed *= -1  # Змінюємо напрям руху, якщо ворог досяг краю екрану
+
+    enemy_rect = enemy_rect.move(enemy_speed, 0)  # Рух ворога
+
+    # AI для атаки гравця
+    if player_rect.colliderect(enemy_rect):
+        # Якщо гравець і ворог зіштовхнулися, ворог атакує гравця
+        player_health -= enemy_attack
+
+
+    
 
     # Якщо гравець не рухається, встановлюємо прапорець анімації в False
     if not keys[K_LEFT] and not keys[K_RIGHT]:
@@ -180,6 +224,7 @@ while playing:
         timer_color = (255, 0, 0)  # Червоний колір
     else:
         timer_color = (0, 255, 0)  # Зелений колір
+
     timer_text = timer_font.render(f"{90 - seconds}", True, timer_color)
     main_display.blit(timer_text, (WIDTH // 2 - timer_text.get_width() // 2, 20))
 
