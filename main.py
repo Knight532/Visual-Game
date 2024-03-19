@@ -1,12 +1,9 @@
 import os
+import random
 import pygame
 from pygame.constants import QUIT, K_LEFT, K_RIGHT, K_UP
 
 pygame.init()
-
-class Player():
-    def __init__(self):
-        health = 100
 
 FPS = pygame.time.Clock()
 
@@ -30,6 +27,8 @@ player_rect = player_image.get_rect()
 player_move_up = [0, -6]  # Збільшимо значення швидкості при стрибку
 player_move_left = [-2, 0]
 player_move_right = [2, 0]
+player_health = 100
+player_attack = random.randint(5, 50)
 
 player_rect.centerx = WIDTH // 5.5  # По горизонталі в центрі
 player_rect.bottom = HEIGHT // 1.25
@@ -40,6 +39,25 @@ is_jumping = False
 animate_player = False
 jump_count = 10  # Кількість кадрів, протягом яких гравець пригаватиме
 image_index = 0
+
+def draw_health_bar(surface, health):
+    # Визначення параметрів полоски здоров'я
+    bar_length = 200
+    bar_height = 20
+    health_bar = pygame.Rect(10, 10, bar_length, bar_height)
+    
+    # Здоров'я гравця відображається червоною полоскою
+    pygame.draw.rect(surface, (255, 0, 0), health_bar)
+    
+    # Обмеження, щоб полоска здоров'я не могла бути меншою за 0
+    current_health = max(health, 0)
+    
+    # Визначення ширини полоски здоров'я відповідно до поточного здоров'я
+    bar_width = int(bar_length * current_health / 100)
+    health_bar.width = bar_width
+    
+    # Малювання полоски здоров'я залежно від поточного здоров'я
+    pygame.draw.rect(surface, (0, 255, 0), health_bar)
 
 while playing:
     FPS.tick(120)
@@ -88,5 +106,7 @@ while playing:
     
     # Відображення гравця
     main_display.blit(player_image, player_rect)
+
+    draw_health_bar(main_display, player_health)
 
     pygame.display.flip()
