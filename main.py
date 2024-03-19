@@ -41,7 +41,7 @@ player_attack = random.randint(5, 20)
 enemy_size = (91, 161)
 enemy_image = pygame.transform.scale(pygame.image.load('D:\\Dev\\Projects\\Visual Game\\enemy.png').convert_alpha(), player_size)
 enemy_rect = enemy_image.get_rect()
-enemy_health = 100
+enemy_health = 50
 enemy_attack = random.randint(5, 20)
 
 player_rect.centerx = WIDTH // 5.5  # По горизонталі в центрі
@@ -61,13 +61,32 @@ animate_player = False
 jump_count = 10  # Кількість кадрів, протягом яких гравець пригаватиме
 image_index = 0
 
-def draw_health_bar(surface, health):
+def draw_health_bar_player(surface, health):
     # Визначення параметрів полоски здоров'я
     bar_length = 200
     bar_height = 20
     health_bar = pygame.Rect(10, 10, bar_length, bar_height)
     
     # Здоров'я гравця відображається червоною полоскою
+    pygame.draw.rect(surface, (255, 0, 0), health_bar)
+    
+    # Обмеження, щоб полоска здоров'я не могла бути меншою за 0
+    current_health = max(health, 0)
+    
+    # Визначення ширини полоски здоров'я відповідно до поточного здоров'я
+    bar_width = int(bar_length * current_health / 100)
+    health_bar.width = bar_width
+    
+    # Малювання полоски здоров'я залежно від поточного здоров'я
+    pygame.draw.rect(surface, (0, 255, 0), health_bar)
+
+def draw_health_bar_enemy(surface, health):
+    # Визначення параметрів полоски здоров'я
+    bar_length = 200
+    bar_height = 20
+    health_bar = pygame.Rect(WIDTH - bar_length - 10, 10, bar_length, bar_height)  # Змінюємо координати для правого верхнього кута
+    
+    # Здоров'я ворога відображається червоною полоскою
     pygame.draw.rect(surface, (255, 0, 0), health_bar)
     
     # Обмеження, щоб полоска здоров'я не могла бути меншою за 0
@@ -145,6 +164,8 @@ while playing:
     #Відображення ворога
     main_display.blit(enemy_image, enemy_rect)
 
-    draw_health_bar(main_display, player_health)
+    draw_health_bar_player(main_display, player_health)
+    draw_health_bar_enemy(main_display, enemy_health)
+
 
     pygame.display.flip()
