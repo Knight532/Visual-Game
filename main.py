@@ -41,7 +41,7 @@ player_attack = random.randint(5, 20)
 enemy_size = (91, 161)
 enemy_image = pygame.transform.scale(pygame.image.load('D:\\Dev\\Projects\\Visual Game\\enemy.png').convert_alpha(), player_size)
 enemy_rect = enemy_image.get_rect()
-enemy_health = 50
+enemy_health = 100
 enemy_attack = random.randint(5, 20)
 
 player_rect.centerx = WIDTH // 5.5  # По горизонталі в центрі
@@ -55,10 +55,14 @@ enemy_rect.bottom = HEIGHT // 1.25
 animate_enemy = True
 enemy_image_index = 0
 
+timer_font = pygame.font.SysFont('Verdana', 40)
+timer_color = (0, 255, 0)
+start_ticks = pygame.time.get_ticks()  # Отримання часу початку
+
 playing = True
 is_jumping = False
 animate_player = False
-jump_count = 10  # Кількість кадрів, протягом яких гравець пригаватиме
+jump_count = 10  # Кількість кадрів, протягом яких гравець пригатиме
 image_index = 0
 
 def draw_health_bar_player(surface, health):
@@ -101,6 +105,14 @@ def draw_health_bar_enemy(surface, health):
 
 while playing:
     FPS.tick(120)
+    seconds = (pygame.time.get_ticks() - start_ticks) // 1000  # Кількість секунд з початку
+    
+    # Перевірка на перемогу
+    if seconds >= 90:  # Якщо пройшло 90 секунд, гра завершується
+        playing = False
+        winner = "Player" if player_health < enemy_health else "Enemy"
+        print(f"The winner is {winner}!")
+
     for event in pygame.event.get():
         if event.type == QUIT:
             playing = False
@@ -149,7 +161,7 @@ while playing:
     # Обробка стрибка
     if is_jumping:
         if jump_count >= -30:  
-            player_rect.y -= (jump_count * abs(jump_count)) * 0.03  
+            player_rect.y -= (jump_count * abs(jump_count)) * 0.03
             jump_count -= 1
         else:
             jump_count = 30
@@ -163,6 +175,13 @@ while playing:
 
     #Відображення ворога
     main_display.blit(enemy_image, enemy_rect)
+
+    if 80 <= seconds <= 90:  # Час 80-90 секунд (останні 10 секунд)
+        timer_color = (255, 0, 0)  # Червоний колір
+    else:
+        timer_color = (0, 255, 0)  # Зелений колір
+    timer_text = timer_font.render(f"{90 - seconds}", True, timer_color)
+    main_display.blit(timer_text, (WIDTH // 2 - timer_text.get_width() // 2, 20))
 
     draw_health_bar_player(main_display, player_health)
     draw_health_bar_enemy(main_display, enemy_health)
