@@ -77,7 +77,7 @@ def draw_health_bar_player(surface, health):
     # Визначення параметрів полоски здоров'я
     bar_length = 200
     bar_height = 20
-    health_bar = pygame.Rect(10, 10, bar_length, bar_height)
+    health_bar = pygame.Rect(100, 20, bar_length, bar_height)
     
     # Здоров'я гравця відображається червоною полоскою
     pygame.draw.rect(surface, (255, 0, 0), health_bar)
@@ -96,7 +96,7 @@ def draw_health_bar_enemy(surface, health):
     # Визначення параметрів полоски здоров'я
     bar_length = 200
     bar_height = 20
-    health_bar = pygame.Rect(WIDTH - bar_length - 10, 10, bar_length, bar_height)  # Змінюємо координати для правого верхнього кута
+    health_bar = pygame.Rect(WIDTH - bar_length - 100, 20, bar_length, bar_height)  # Змінюємо координати для правого верхнього кута
 
     # Здоров'я ворога відображається червоною полоскою
     pygame.draw.rect(surface, (255, 0, 0), health_bar)
@@ -110,6 +110,32 @@ def draw_health_bar_enemy(surface, health):
 
     # Малювання полоски здоров'я залежно від поточного здоров'я
     pygame.draw.rect(surface, (0, 255, 0), health_bar)
+    
+def frame_player():
+    frame_size = (50, 50)
+    frame_position = (20, 10)
+
+    # Намалювати рамку на екрані
+    frame_rect = pygame.Rect(frame_position, frame_size)
+    pygame.draw.rect(main_display, (255, 255, 255), frame_rect, 2)  # Рамка буде білого кольору та товщиною 2 пікселя
+
+    # Відобразіть зображення гравця всередині рамки
+    player_image_scaled = pygame.transform.scale(pygame.image.load('D:\\Dev\\Projects\\Visual Game\\player_img.png').convert_alpha(), (frame_size[0]-10, frame_size[1]-10))  # Зменшити розмір зображення гравця на 10 пікселів від кожного боку
+    player_rect_frame = player_image_scaled.get_rect(center=frame_rect.center)
+    return player_image_scaled, player_rect_frame
+
+def frame_enemy():
+    frame_size = (50, 50)
+    frame_position = (1125, 10)
+
+    # Намалювати рамку на екрані
+    frame_rect = pygame.Rect(frame_position, frame_size)
+    pygame.draw.rect(main_display, (255, 255, 255), frame_rect, 2)  # Рамка буде білого кольору та товщиною 2 пікселя
+
+    # Відобразіть зображення гравця всередині рамки
+    player_image_scaled = pygame.transform.scale(pygame.image.load('D:\\Dev\\Projects\\Visual Game\\enemy_img.png').convert_alpha(), (frame_size[0]-10, frame_size[1]-10))  # Зменшити розмір зображення гравця на 10 пікселів від кожного боку
+    player_rect_frame = player_image_scaled.get_rect(center=frame_rect.center)
+    return player_image_scaled, player_rect_frame
 
 while playing:
     FPS.tick(120)
@@ -145,33 +171,6 @@ while playing:
                 if enemy_image_index >= len(ENEMY_IMAGES_LEFT):
                     enemy_image_index = 0
 
-        if player_x < enemy_x:
-            enemy_direction = "left"  # Гравець знаходиться лівіше ворога
-        else:
-            enemy_direction = "right"  # Гравець знаходиться правіше ворога
-
-        # Визначення зображення ворога відповідно до його розташування та анімації
-        # if enemy_direction == "left":
-        #     enemy_image = pygame.image.load(os.path.join(ENEMY_IMAGE_PATH, "enemy_left.png"))
-        # else:
-        #     enemy_image = pygame.image.load(os.path.join(ENEMY_IMAGE_PATH, "enemy_right.png"))
-
-        # # Перевірка та зміна анімації ворога в залежності від напрямку руху
-        # if enemy_direction == "left":
-        #     if animate_enemy:  
-        #         enemy_image = pygame.image.load(os.path.join(ENEMY_IMAGE_PATH, ENEMY_IMAGES_left[enemy_image_index]))
-        #         enemy_image = pygame.transform.scale(enemy_image, enemy_size)  
-        #         enemy_image_index += 1
-        #         if enemy_image_index >= len(ENEMY_IMAGES_left):
-        #             enemy_image_index = 0
-        # else:
-        #     if animate_enemy:  
-        #         enemy_image = pygame.image.load(os.path.join(ENEMY_IMAGE_PATH, ENEMY_IMAGES_right[enemy_image_index]))
-        #         enemy_image = pygame.transform.scale(enemy_image, enemy_size)  
-        #         enemy_image_index += 1
-        #         if enemy_image_index >= len(ENEMY_IMAGES_right):
-        #             enemy_image_index = 0
-
     keys = pygame.key.get_pressed()
 
     # Обробка руху гравця
@@ -194,9 +193,6 @@ while playing:
     if player_rect.colliderect(enemy_rect):
         # Якщо гравець і ворог зіштовхнулися, ворог атакує гравця
         player_health -= enemy_attack
-
-
-    
 
     # Якщо гравець не рухається, встановлюємо прапорець анімації в False
     if not keys[K_LEFT] and not keys[K_RIGHT]:
@@ -227,6 +223,11 @@ while playing:
 
     timer_text = timer_font.render(f"{90 - seconds}", True, timer_color)
     main_display.blit(timer_text, (WIDTH // 2 - timer_text.get_width() // 2, 20))
+    player_image_scaled, player_rect_frame = frame_player()
+    main_display.blit(player_image_scaled, player_rect_frame)
+    enemy_image_scaled, enemy_rect_frame = frame_enemy()
+    main_display.blit(enemy_image_scaled, enemy_rect_frame)
+    
 
     draw_health_bar_player(main_display, player_health)
     draw_health_bar_enemy(main_display, enemy_health)
