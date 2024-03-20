@@ -117,7 +117,7 @@ def frame_player():
 
     # Намалювати рамку на екрані
     frame_rect = pygame.Rect(frame_position, frame_size)
-    pygame.draw.rect(main_display, (255, 255, 255), frame_rect, 2)  # Рамка буде білого кольору та товщиною 2 пікселя
+    pygame.draw.rect(main_display, (255, 255, 255), frame_rect, 1)  # Рамка буде білого кольору та товщиною 2 пікселя
 
     # Відобразіть зображення гравця всередині рамки
     player_image_scaled = pygame.transform.scale(pygame.image.load('D:\\Dev\\Projects\\Visual Game\\player_img.png').convert_alpha(), (frame_size[0]-10, frame_size[1]-10))  # Зменшити розмір зображення гравця на 10 пікселів від кожного боку
@@ -130,7 +130,7 @@ def frame_enemy():
 
     # Намалювати рамку на екрані
     frame_rect = pygame.Rect(frame_position, frame_size)
-    pygame.draw.rect(main_display, (255, 255, 255), frame_rect, 2)  # Рамка буде білого кольору та товщиною 2 пікселя
+    pygame.draw.rect(main_display, (255, 255, 255), frame_rect, 1)  # Рамка буде білого кольору та товщиною 2 пікселя
 
     # Відобразіть зображення гравця всередині рамки
     player_image_scaled = pygame.transform.scale(pygame.image.load('D:\\Dev\\Projects\\Visual Game\\enemy_img.png').convert_alpha(), (frame_size[0]-10, frame_size[1]-10))  # Зменшити розмір зображення гравця на 10 пікселів від кожного боку
