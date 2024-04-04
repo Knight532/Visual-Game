@@ -1,7 +1,7 @@
 import os
 import random
 import pygame
-from pygame.constants import QUIT, K_LEFT, K_RIGHT, K_UP
+from pygame.constants import QUIT, K_LEFT, K_RIGHT
 
 pygame.init()
 
@@ -68,6 +68,7 @@ timer_color = (0, 255, 0)
 start_ticks = pygame.time.get_ticks()  # Отримання часу початку
 
 playing = True
+is_sitting = False
 is_jumping = False
 animate_player = False
 jump_count = 10  # Кількість кадрів, протягом яких гравець пригатиме
@@ -137,7 +138,10 @@ def frame_enemy():
     player_rect_frame = player_image_scaled.get_rect(center=frame_rect.center)
     return player_image_scaled, player_rect_frame
 
+distance_x = enemy_rect.centerx - player_rect.centerx
+
 while playing:
+    is_sitting = False
     FPS.tick(120)
     seconds = (pygame.time.get_ticks() - start_ticks) // 1000  # Кількість секунд з початку
     
@@ -154,6 +158,10 @@ while playing:
             if event.key == pygame.K_UP and not is_jumping:  
                 is_jumping = True
                 jump_count = 30  # Встановлюємо кількість кадрів стрибка
+                print("sda")
+
+            if event.key == pygame.K_DOWN and not is_sitting:
+                is_sitting = True
 
         if event.type == CHANGE_IMAGE:
             if animate_player:  # Перевіряємо, чи потрібно змінювати зображення гравця
@@ -182,8 +190,6 @@ while playing:
         player_rect = player_rect.move(3, 0)  # Рух вправо
         animate_player = True  # Встановлюємо прапорець анімації
 
-        
-
     if enemy_rect.left <= 0 or enemy_rect.right >= WIDTH:
         enemy_speed *= -1  # Змінюємо напрям руху, якщо ворог досяг краю екрану
 
@@ -206,6 +212,11 @@ while playing:
         else:
             jump_count = 30
             is_jumping = False
+
+    # Обробка сидіння
+    if is_sitting:
+        print("sitting")
+        
 
     # Відображення фону
     main_display.blit(background_image, (0, 0))
